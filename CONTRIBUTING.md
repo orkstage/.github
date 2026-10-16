@@ -27,29 +27,19 @@ modules and adapters are all welcome.
 
 ## Your first contribution
 
-1. Get the workspace: `orkstage-dev` holds every repository as a submodule and runs the whole
-   platform in Docker.
-
-   ```bash
-   git clone --recurse-submodules https://github.com/orkstage/orkstage-dev.git
-   cd orkstage-dev
-   pnpm bootstrap
-   pnpm platform:up        # console at http://localhost:3000
-   ```
-
-   Sign in as `admin@example.local` or `customer@example.local`; development sign in needs no
-   password, and the seeded simulation targets need no cloud account.
-2. Read `AGENTS.md` at the workspace root and in the repository you change. It has the commands,
-   the rules every change keeps and the writing rules. Step by step guides for common jobs (a
-   provider, a resource type, an API endpoint, a console page) are in `.claude/skills/`; they are
-   plain Markdown, useful with or without an AI assistant.
+1. Clone the repository you want to change and follow its setup (its CONTRIBUTING file, linked in
+   the table above). The core runs locally with Docker for Postgres and Redis; the console, CLI,
+   modules and site build on their own. The full workspace that runs the whole platform in Docker
+   (`orkstage-dev`) opens later; until then, ask in Discussions if you need the complete stack.
+2. Read `AGENTS.md` in the repository you change. It has the commands, the rules every change keeps
+   and the writing rules. Step by step guides for common jobs (a
+   provider, a resource type, an API endpoint, a console page) are plain Markdown, useful with or
+   without an AI assistant; they move to the public workspace when it opens.
 3. Pick something: issues labeled
    [good first issue](https://github.com/search?q=org%3Aorkstage+label%3A%22good+first+issue%22+state%3Aopen&type=issues)
-   or [help wanted](https://github.com/search?q=org%3Aorkstage+label%3A%22help+wanted%22+state%3Aopen&type=issues),
-   or an item of the plans in `orkstage-dev/docs/` (each one says what exists, what to build and
-   how to know it is done). Comment on the issue first so two people do not build the same thing.
-4. Check your change end to end against the local stack (`.claude/skills/local-e2e`), and run the
-   repository's checks before you push. New source files need the SPDX header: run
+   or [help wanted](https://github.com/search?q=org%3Aorkstage+label%3A%22help+wanted%22+state%3Aopen&type=issues).
+   Comment on the issue first so two people do not build the same thing.
+4. Run the repository's checks before you push. New source files need the SPDX header: run
    `bash scripts/spdx.sh --fix` in orkstage, orkstage-console or orkstage-cli.
 
 ## Workflow
