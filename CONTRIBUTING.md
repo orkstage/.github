@@ -72,13 +72,20 @@ modules and adapters are all welcome.
 
 ## Contributor license agreement
 
-The OrkStage core is offered under the AGPL and under a commercial license, so contributions
-will need a short Contributor License Agreement (in the style of the Apache ICLA), signed once
-through a bot on your first pull request. The CLA text is in legal review. Until the bot is
-active, a maintainer will contact you before your first contribution is merged.
+The OrkStage core is offered under the AGPL and under a commercial license, so every
+contribution is accepted under the [OrkStage Contributor License Agreement](CLA.md). You keep the
+copyright in your work; the agreement gives the project the licenses it needs, including the right
+to offer your contribution under the Enterprise License. On your first pull request a bot asks you
+to accept it with a comment; it then covers all your later contributions, in every repository.
+Contributing for your employer? See section 7 of the agreement.
 
 Contributions to `orkstage-modules` (Apache-2.0) and `orkstage-site` (MIT, CC BY 4.0) follow
 the same process.
+
+## Trademarks
+
+The code is open source; the OrkStage name and logos are not. Forks use their own name. See the
+[trademark policy](TRADEMARKS.md).
 
 ## Code of conduct
 
