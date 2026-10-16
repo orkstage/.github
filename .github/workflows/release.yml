@@ -1,0 +1,98 @@
+name: Release
+
+# Shared by the versioned OrkStage repositories through a small caller workflow. Both jobs use
+# git-cliff with the caller's cliff.toml, so CHANGELOG.md and the release notes always match.
+#
+# - workflow_dispatch with a version (0.2.0): regenerates CHANGELOG.md for v0.2.0 on a branch
+#   release/v0.2.0. Open the pull request from the link in the run summary (GitHub Actions may not
+#   open pull requests in this organization), add the version bump to it if the repository has
+#   one, merge it, then tag the merge commit v0.2.0.
+# - push of a tag v0.2.0 or v0.2.0-rc.1: creates the GitHub release with the notes of that
+#   version (a release candidate gets the changes since the last release). orkstage-cli does not
+#   call this job: its build creates the release with the binaries, using the same notes.
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version to prepare, without the v (workflow_dispatch only)
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  changelog:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ inputs.version }}
+    steps:
+      - name: Check the version
+        run: |
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::The version must look like 0.2.0 (release candidates need no changelog), got '$VERSION'."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "refs/tags/v$VERSION" >/dev/null; then
+            echo "::error::v$VERSION is already tagged."
+            exit 1
+          fi
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: orhun/git-cliff-action@v4.9.1
+        with:
+          version: v2.14.2
+          config: cliff.toml
+          args: --tag v${{ inputs.version }}
+        env:
+          OUTPUT: CHANGELOG.md
+      - name: Push the release branch
+        run: |
+          branch="release/v$VERSION"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          git add CHANGELOG.md
+          git commit -m "chore(release): v$VERSION"
+          git push --force origin "$branch"
+          {
+            echo "### v$VERSION is ready for review"
+            echo
+            echo "[Open the pull request]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...$branch?expand=1&title=chore(release):%20v$VERSION)"
+            echo "for \`$branch\`. Add the version bump to the branch if this repository has one, merge it,"
+            echo "then tag the merge commit: \`git tag v$VERSION && git push origin v$VERSION\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  notes:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: orhun/git-cliff-action@v4.9.1
+        with:
+          version: v2.14.2
+          config: cliff.toml
+          args: --current --strip all
+        env:
+          OUTPUT: NOTES.md
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # The release title already names the version: drop the section heading.
+          sed -i '1{/^## /d}' NOTES.md
+          pre=""
+          case "$GITHUB_REF_NAME" in *-*) pre="--prerelease" ;; esac
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --notes-file NOTES.md
+          else
+            gh release create "$GITHUB_REF_NAME" --verify-tag --title "${GITHUB_REPOSITORY#*/} ${GITHUB_REF_NAME#v}" --notes-file NOTES.md $pre
+          fi
