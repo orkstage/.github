@@ -1,0 +1,52 @@
+name: Provider request
+description: Ask for a cloud or platform provider, or for a resource type on one OrkStage supports.
+labels: [provider, enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        OrkStage provisions AWS today. Azure, Google Cloud, OCI, DigitalOcean, Vultr, CoreWeave, Magalu Cloud,
+        Vercel, Render and Supabase have adapters in preview, off by default until verified on live accounts
+        (see [providers](https://orkstage.io/docs/providers/)). Reports from people who tried one are as welcome
+        as requests for a new provider.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Request
+      options:
+        - A new provider
+        - A resource type on a provider OrkStage supports
+        - A provider in preview, tested on a live account (report)
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: Provider
+      placeholder: Hetzner Cloud
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources you need
+      description: The template resource types (network, compute.container-service, database.postgresql, ...) and the provider services you expect behind them.
+      placeholder: database.postgresql on managed PostgreSQL; compute.container-service on their container service.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why this provider (region, cost, compliance, existing contracts), and whether there is an official OpenTofu provider.
+  - type: textarea
+    id: report
+    attributes:
+      label: Live account report
+      description: For a preview provider you tried. What you deployed, what worked, what failed (with the deployment correlation id). Never paste credentials or tokens.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I can help build or test it (the adapter guide is `.claude/skills/add-provider` in orkstage-dev).
