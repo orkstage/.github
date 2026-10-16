@@ -6,6 +6,12 @@
 
 <!-- Commands you ran, environments (MiniStack, a real AWS account, simulated), screenshots for UI changes. -->
 
+## AI assistance
+
+<!-- AI tools are welcome. You are responsible for every line: read it, run it, test it. -->
+
+- [ ] AI tools helped write this change, and I have read, run and tested all of it myself.
+
 ## Checklist
 
 - [ ] The checks in the repository's CONTRIBUTING file pass on my machine.
