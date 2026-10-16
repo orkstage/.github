@@ -44,7 +44,16 @@ jobs:
               const end = rest.findIndex((l) => l.trim().startsWith('## '));
               return (end < 0 ? rest : rest.slice(0, end)).join('\n').replace(/<!--[\s\S]*?-->/g, '').trim();
             };
-            const trusted = pr.user.type === 'Bot' || ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association);
+            // The event's author_association can say CONTRIBUTOR for an organization member, so the
+            // author's permission on the repository decides as well.
+            let permission = 'none';
+            if (pr.user.type !== 'Bot') {
+              permission = await github.rest.repos
+                .getCollaboratorPermissionLevel({ ...context.repo, username: pr.user.login })
+                .then((r) => r.data.permission, () => 'none');
+            }
+            core.info(`author ${pr.user.login}: association ${pr.author_association}, permission ${permission}`);
+            const trusted = pr.user.type === 'Bot' || ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association) || ['admin', 'maintain', 'write'].includes(permission);
             const problems = [];
             if (!trusted) {
               if (!section('How it was tested')) {
