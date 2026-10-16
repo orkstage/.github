@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.svg">
-    <img alt="OrkStage. Command every stage of your cloud." src="assets/banner-light.svg" width="100%">
+    <img alt="OrkStage. Orchestrate every cloud from one stage." src="assets/banner-light.svg" width="100%">
   </picture>
 </p>
 
@@ -39,6 +39,7 @@ walks through the first deployment against a local AWS emulator.
 [Website](https://orkstage.io) |
 [Documentation](https://orkstage.io/docs) |
 [Discussions](https://github.com/orgs/orkstage/discussions) |
+[Slack](https://orkstage.slack.com) |
 [Contributing](https://github.com/orkstage/.github/blob/main/CONTRIBUTING.md) |
 [Security](https://github.com/orkstage/.github/blob/main/SECURITY.md)
 

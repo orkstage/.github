@@ -3,7 +3,8 @@
 | You want to | Go to |
 |---|---|
 | Learn how OrkStage works or how to set it up | [Documentation](https://orkstage.io/docs) |
-| Ask a question or share an idea | [GitHub Discussions](https://github.com/orgs/orkstage/discussions) |
+| Ask a question or share an idea | [GitHub Discussions](https://github.com/orgs/orkstage/discussions), so others find the answer later |
+| Chat with the community and the maintainers | [Slack](https://orkstage.slack.com) |
 | Report a bug | The issues of the repository that owns the code (the issue forms help you choose) |
 | Request a feature | A feature request issue, or a discussion for early ideas |
 | Report a vulnerability | Privately, as described in [SECURITY.md](SECURITY.md) |
