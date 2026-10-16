@@ -6,7 +6,7 @@ modules and adapters are all welcome.
 ## Before you start
 
 - **Questions** go to [GitHub Discussions](https://github.com/orgs/orkstage/discussions), not
-  to issues.
+  to issues. For a quick conversation, join [Slack](https://orkstage.slack.com).
 - **Bugs and feature requests** go to the issues of the repository that owns the code. Search
   first; add your case to an existing issue when there is one.
 - **Larger changes** (a new provider, a schema change, a new API surface) start with an issue or
