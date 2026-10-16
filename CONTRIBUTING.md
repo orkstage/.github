@@ -51,6 +51,30 @@ modules and adapters are all welcome.
    style, for example `feat(aws): ECS service autoscaling` or `fix(cli): exit code on timeout`.
 5. Open the pull request and fill in the template. A maintainer reviews it; expect questions.
 
+## AI assisted contributions
+
+AI tools are welcome, for code, docs and issues. The person who opens the pull request is still its
+author:
+
+- Read, run and test everything you submit, and fill in "How it was tested" with what you actually
+  did. A pull request without it fails the policy check.
+- Tick "AI tools helped" in the template when they did; the pull request gets the `ai-assisted`
+  label. It does not change how it is reviewed, it helps reviewers know what to look for.
+- Answer review questions yourself, and keep the change small enough to explain.
+- New features start from an issue or a discussion that a maintainer accepted; link it in the
+  summary (the policy check looks for it on `feat` pull requests).
+- Issues need real reproduction steps and versions, not a generated guess. Generated issues or
+  pull requests that were not checked by a person are closed with a link to this section.
+
+## Triage
+
+| Label | Meaning |
+|---|---|
+| `good first issue`, `help wanted` | Ready for a contributor; comment before you start |
+| `ai-assisted` | Set from the pull request template |
+| `waiting-for-author` | The maintainers need an answer or a change; closes after 21 days without activity |
+| `documentation`, `ci`, `dependencies`, `provider` | Set from the changed paths |
+
 ## What we look for
 
 - **Honest status.** Simulated providers stay labeled as simulated, and features in Preview or

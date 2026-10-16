@@ -1,0 +1,102 @@
+name: Community
+
+# Shared by every public OrkStage repository through a small caller workflow
+# (`uses: orkstage/.github/.github/workflows/community.yml@main`). It runs on the caller's events:
+# pull_request_target (labels and the pull request policy), issues (welcome) and schedule (stale).
+# pull_request_target is safe here: no job checks out or runs the pull request's code.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  # Labels by changed path, from the caller repository's .github/labeler.yml.
+  labels:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v5
+
+  # The contribution policy in CONTRIBUTING.md ("AI assisted contributions"): the author says how
+  # the change was tested, a new feature links an accepted issue, and the "AI tools helped" box sets
+  # the ai-assisted label. Maintainers and bots are exempt from the first two checks.
+  policy:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+            const lines = body.split(/\r?\n/);
+            const section = (title) => {
+              const start = lines.findIndex((l) => l.trim().toLowerCase().startsWith('## ' + title.toLowerCase()));
+              if (start < 0) return '';
+              const rest = lines.slice(start + 1);
+              const end = rest.findIndex((l) => l.trim().startsWith('## '));
+              return (end < 0 ? rest : rest.slice(0, end)).join('\n').replace(/<!--[\s\S]*?-->/g, '').trim();
+            };
+            const trusted = pr.user.type === 'Bot' || ['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association);
+            const problems = [];
+            if (!trusted) {
+              if (!section('How it was tested')) {
+                problems.push('Fill in "How it was tested": the commands you ran and what you checked.');
+              }
+              const linksIssue = /(#\d+|github\.com\/orkstage\/[\w.-]+\/(issues|discussions)\/\d+)/.test(body);
+              if (/^feat/i.test(pr.title) && !linksIssue) {
+                problems.push('A new feature needs an accepted issue or discussion: link it in the summary, for example "Closes #123".');
+              }
+            }
+            const ai = /^\s*-\s*\[x\]\s*AI tools helped/im.test(body);
+            const has = pr.labels.some((l) => l.name === 'ai-assisted');
+            const issue = { ...context.repo, issue_number: pr.number };
+            if (ai && !has) await github.rest.issues.addLabels({ ...issue, labels: ['ai-assisted'] });
+            if (!ai && has) await github.rest.issues.removeLabel({ ...issue, name: 'ai-assisted' }).catch(() => {});
+            if (problems.length) core.setFailed(problems.join('\n'));
+
+  # A first message for people new to the project.
+  welcome:
+    if: github.event_name == 'issues' || (github.event_name == 'pull_request_target' && github.event.action == 'opened')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: >-
+            Thank you for opening your first issue in OrkStage. A maintainer will look at it soon.
+            Questions are often answered faster in [GitHub Discussions](https://github.com/orgs/orkstage/discussions)
+            or on [Slack](https://orkstage.slack.com).
+          pr-message: >-
+            Thank you for your first pull request to OrkStage. Before review: fill in "How it was tested",
+            read the [contribution guide](https://github.com/orkstage/.github/blob/main/CONTRIBUTING.md)
+            (including the part on AI assisted contributions), and accept the CLA when the bot asks.
+
+  # Issues and pull requests waiting on their author are closed after three weeks of silence;
+  # nothing else is touched.
+  stale:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          only-labels: waiting-for-author
+          days-before-stale: 14
+          days-before-close: 7
+          stale-issue-message: This issue is waiting for more information from its author. It closes in 7 days without an answer; comment to keep it open.
+          stale-pr-message: This pull request is waiting for changes from its author. It closes in 7 days without activity; push or comment to keep it open.
+          close-issue-message: Closed for lack of an answer. Comment with the requested information and it will be reopened.
+          close-pr-message: Closed for lack of activity. You are welcome to reopen it when you continue.
